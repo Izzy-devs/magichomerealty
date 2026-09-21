@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | Magic Home Realty</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: var(--bg-light); }
+  .admin-shell { display: flex; min-height: 100vh; }
+  @media (max-width: 880px) {
+    .admin-shell { flex-direction: column; }
+    .admin-sidebar { width: 100%; padding: 16px 20px; }
+    .admin-sidebar .who { margin-bottom: 12px; }
+    .admin-sidebar nav ul { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    .admin-sidebar .back-link, .admin-sidebar .signout-link { display: inline-block; margin-right: 16px; margin-top: 10px; }
+    .admin-main { padding: 20px; }
+  }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+  .table-scroll .admin-table { min-width: 640px; }
+  .admin-sidebar { width: 230px; background: var(--navy); color: rgba(255,255,255,0.8); padding: 26px 20px; flex-shrink: 0; }
+  .admin-sidebar .logo { display: block; margin-bottom: 6px; font-size: 1.1rem; }
+  .admin-sidebar .who { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-bottom: 24px; }
+  .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .admin-sidebar nav a { display: block; padding: 10px 12px; border-radius: var(--radius); color: rgba(255,255,255,0.75); font-size: 0.92rem; cursor: pointer; }
+  .admin-sidebar nav a.is-active, .admin-sidebar nav a:hover { background: var(--navy-soft); color: var(--white); }
+  .admin-sidebar .back-link, .admin-sidebar .signout-link { display: block; margin-top: 14px; font-size: 0.82rem; color: rgba(255,255,255,0.5); cursor: pointer; }
+  .admin-sidebar .back-link:hover, .admin-sidebar .signout-link:hover { color: var(--gold); }
+
+  .admin-main { flex: 1; padding: 40px; max-width: 1200px; }
+  .admin-banner { background: #FFF7E6; border: 1px solid var(--gold); color: #7A5B0E; padding: 12px 18px; border-radius: var(--radius); font-size: 0.86rem; margin-bottom: 26px; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 36px; }
+  @media (max-width: 700px) { .stat-row { grid-template-columns: 1fr; } }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .stat-card strong { display: block; font-family: var(--font-head); font-size: 2rem; color: var(--navy); }
+  .stat-card span { color: var(--text-secondary); font-size: 0.88rem; }
+
+  .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+
+  .admin-table { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 0.86rem; }
+  .admin-table th, .admin-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .admin-table th { background: var(--bg-light); color: var(--text-secondary); font-weight: 600; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table img.thumb { width: 48px; height: 36px; object-fit: cover; border-radius: 2px; }
+  .admin-table .thumb-round { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .row-actions button, .row-actions select { font-size: 0.76rem; padding: 5px 9px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--white); cursor: pointer; }
+  .row-actions button.danger { color: #B91C1C; border-color: #FCA5A5; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+  .pill--active { background: #DCFCE7; color: #166534; }
+  .pill--inactive { background: #F1F5F9; color: #64748B; }
+  .pill--featured { background: #FEF3C7; color: #92400E; }
+
+  .admin-panel { display: none; }
+  .admin-panel.is-active { display: block; }
+  .empty-row td { color: var(--text-secondary); text-align: center; padding: 26px; }
+
+  .auth-shell { max-width: 400px; margin: 100px auto; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 34px; }
+  .auth-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .auth-tabs button { flex: 1; padding: 9px; border: 1px solid var(--border); background: var(--bg-light); border-radius: var(--radius); font-size: 0.86rem; cursor: pointer; }
+  .auth-tabs button.is-active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+  .auth-error { color: #B91C1C; font-size: 0.85rem; margin-top: 10px; display: none; }
+  .auth-note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 16px; }
+
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 200; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+  .modal-backdrop.is-open { display: flex; }
+  .modal { background: var(--white); border-radius: var(--radius); max-width: 640px; width: 100%; padding: 30px; }
+  .modal h2 { margin-bottom: 18px; }
+  .modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-secondary); line-height: 1; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+  .checkbox-row input { width: auto; }
+</style>
+</head>
+<body>
+
+<div class="auth-shell" id="auth-shell">
+  <h2 style="margin-bottom:4px;">Admin Access</h2>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:20px;">Sign in with your Magic Home Realty admin account. New team accounts are created by a super admin from inside the dashboard — there's no public sign-up.</p>
+
+  <form id="signin-form">
+    <div class="field" style="margin-bottom:14px;"><label for="si-email">Email</label><input type="email" id="si-email" required></div>
+    <div class="field" style="margin-bottom:18px;"><label for="si-pass">Password</label><input type="password" id="si-pass" required></div>
+    <button type="submit" class="btn btn--navy btn--block">Sign In</button>
+  </form>
+
+  <p class="auth-error" id="auth-error"></p>
+</div>
+
+<div class="auth-shell" id="pending-shell" style="display:none;">
+  <h2 style="margin-bottom:10px;">No Dashboard Access Yet</h2>
+  <p style="font-size:0.9rem;color:var(--text-secondary);">You're signed in as <strong id="pending-email"></strong>, but this account hasn't been added to the team. Ask a super admin to invite you from the dashboard's Team panel.</p>
+  <button class="btn btn--outline-dark btn--block mt-40" id="pending-signout">Sign Out</button>
+</div>
+
+<div class="admin-shell" id="admin-shell" style="display:none;">
+  <aside class="admin-sidebar">
+    <span class="logo">MAGIC <span style="color:var(--gold)">HOME</span> ADMIN</span>
+    <span class="who" id="who-am-i"></span>
+    <nav>
+      <ul>
+        <li><a data-panel="overview" class="is-active">Overview</a></li>
+        <li><a data-panel="properties">Properties</a></li>
+        <li><a data-panel="agents">Agents</a></li>
+        <li><a data-panel="inquiries">Inquiries</a></li>
+        <li><a data-panel="reviews">Reviews</a></li>
+        <li><a data-panel="team">Team</a></li>
+      </ul>
+    </nav>
+    <a href="index.html" class="back-link">&larr; Back to public site</a>
+    <span class="signout-link" id="signout-link">Sign Out</span>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-banner">This dashboard writes directly to the live Magic Home Realty Supabase project. Changes here appear on the public site immediately.</div>
+
+    <section class="admin-panel is-active" id="panel-overview">
+      <h2>Overview</h2>
+      <div class="stat-row">
+        <div class="stat-card"><strong id="stat-properties">0</strong><span>Total Properties</span></div>
+        <div class="stat-card"><strong id="stat-agents">0</strong><span>Agents</span></div>
+        <div class="stat-card"><strong id="stat-inquiries">0</strong><span>Inquiries (New)</span></div>
+      </div>
+    </section>
+
+    <section class="admin-panel" id="panel-properties">
+      <div class="panel-head"><h2>Properties</h2><button class="btn btn--gold btn--sm" id="add-property-btn">+ Add Property</button></div>
+      <div class="table-scroll"><table class="admin-table">
+        <thead><tr><th></th><th>Title</th><th>Address</th><th>Price</th><th>Status</th><th>Agent</th><th>Featured</th><th>Published</th><th>Actions</th></tr></thead>
+        <tbody id="properties-table"></tbody>
+      </table></div>
+    </section>
+
+    <section class="admin-panel" id="panel-agents">
+      <div class="panel-head"><h2>Agents</h2><button class="btn btn--gold btn--sm" id="add-agent-btn">+ Add Agent</button></div>
+      <div class="table-scroll"><table class="admin-table">
+        <thead><tr><th></th><th>Name</th><th>Title</th><th>Areas Served</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
+        <tbody id="agents-table"></tbody>
+      </table></div>
+    </section>
+
+    <section class="admin-panel" id="panel-inquiries">
+      <h2>Inquiries</h2>
+      <p style="color:var(--text-secondary);margin-bottom:18px;">Submissions from the Contact and Property pages.</p>
+      <div class="table-scroll"><table class="admin-table">
+        <thead><tr><th>Received</th><th>Name</th><th>Contact</th><th>Type</th><th>Property</th><th>Message</th><th>Agent</th><th>Status</th></tr></thead>
+        <tbody id="inquiries-table"></tbody>
+      </table></div>
+    </section>
+
+    <section class="admin-panel" id="panel-reviews">
+      <h2>Reviews / Testimonials</h2>
+      <p style="color:var(--text-secondary);margin-bottom:18px;">All current reviews are placeholder content — replace with verified reviews.</p>
+      <div class="table-scroll"><table class="admin-table">
+        <thead><tr><th>Reviewer</th><th>Date</th><th>Rating</th><th>Quote</th><th>Published</th><th>Actions</th></tr></thead>
+        <tbody id="reviews-table"></tbody>
+      </table></div>
+    </section>
+
+    <section class="admin-panel" id="panel-team">
+      <div class="panel-head"><h2>Team &amp; Access</h2><button class="btn btn--gold btn--sm" id="add-team-btn" style="display:none;">+ Invite Team Member</button></div>
+      <p style="color:var(--text-secondary);margin-bottom:18px;" id="team-note">Super admins can invite new admin or agent accounts and assign their role.</p>
+      <div class="table-scroll"><table class="admin-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Linked Agent</th></tr></thead>
+        <tbody id="team-table"></tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<!-- Team invite modal -->
+<div class="modal-backdrop" id="team-modal">
+  <div class="modal">
+    <button class="modal-close" data-close="team-modal">&times;</button>
+    <h2>Invite Team Member</h2>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Creates a real login for this person. Share the email/password with them directly — they can change the password after signing in.</p>
+    <form id="team-form">
+      <div class="form-grid">
+        <div class="field full"><label>Full Name</label><input type="text" id="tf-name" required></div>
+        <div class="field full"><label>Email</label><input type="email" id="tf-email" required></div>
+        <div class="field full"><label>Temporary Password</label><input type="text" id="tf-password" minlength="6" required></div>
+        <div class="field full"><label>Role</label>
+          <select id="tf-role">
+            <option value="admin">Admin — manage agents, properties, inquiries, reviews</option>
+            <option value="agent">Agent — view own profile &amp; assigned listings</option>
+            <option value="super_admin">Super Admin — full access incl. team management</option>
+          </select>
+        </div>
+        <div class="field full" id="tf-agent-row" style="display:none;"><label>Linked Agent Record</label><select id="tf-agent"></select></div>
+      </div>
+      <p class="auth-error" id="team-error"></p>
+      <button type="submit" class="btn btn--navy mt-40">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- Property modal -->
+<div class="modal-backdrop" id="property-modal">
+  <div class="modal">
+    <button class="modal-close" data-close="property-modal">&times;</button>
+    <h2 id="property-modal-title">Add Property</h2>
+    <form id="property-form">
+      <input type="hidden" id="pf-id">
+      <div class="form-grid">
+        <div class="field full"><label>Title</label><input type="text" id="pf-title" required></div>
+        <div class="field full"><label>Description</label><textarea id="pf-description" rows="3"></textarea></div>
+        <div class="field"><label>Price</label><input type="number" id="pf-price"></div>
+        <div class="field"><label>Property Type</label>
+          <select id="pf-type">
+            <option>Single Family</option><option>Multi Family</option><option>Condo</option>
+            <option>Co-op</option><option>Townhouse</option><option>Land</option><option>Commercial</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field full"><label>Address</label><input type="text" id="pf-address" placeholder="e.g. Jamaica, NY"></div>
+        <div class="field"><label>ZIP Code</label><input type="text" id="pf-zip"></div>
+        <div class="field"><label>Listing Status</label>
+          <select id="pf-status"><option>For Sale</option><option>For Rent</option><option>Pending</option><option>Sold</option><option>Off Market</option></select>
+        </div>
+        <div class="field"><label>Bedrooms</label><input type="number" id="pf-beds"></div>
+        <div class="field"><label>Bathrooms</label><input type="number" step="0.5" id="pf-baths"></div>
+        <div class="field"><label>Square Feet</label><input type="number" id="pf-sqft"></div>
+        <div class="field"><label>Year Built</label><input type="number" id="pf-year"></div>
+        <div class="field full"><label>Features (comma-separated)</label><input type="text" id="pf-features" placeholder="Updated kitchen, Private driveway"></div>
+        <div class="field full"><label>Featured Image URL</label><input type="text" id="pf-image"></div>
+        <div class="field full"><label>Gallery Image URLs (comma-separated)</label><input type="text" id="pf-gallery"></div>
+        <div class="field full"><label>Listing Agent</label><select id="pf-agent"><option value="">Unassigned</option></select></div>
+        <div class="field"><div class="checkbox-row"><input type="checkbox" id="pf-featured"><label for="pf-featured">Featured on homepage</label></div></div>
+        <div class="field"><div class="checkbox-row"><input type="checkbox" id="pf-published" checked><label for="pf-published">Published (visible on site)</label></div></div>
+      </div>
+      <button type="submit" class="btn btn--navy mt-40">Save Property</button>
+    </form>
+  </div>
+</div>
+
+<!-- Agent modal -->
+<div class="modal-backdrop" id="agent-modal">
+  <div class="modal">
+    <button class="modal-close" data-close="agent-modal">&times;</button>
+    <h2 id="agent-modal-title">Add Agent</h2>
+    <form id="agent-form">
+      <input type="hidden" id="af-id">
+      <div class="form-grid">
+        <div class="field full"><label>Full Name</label><input type="text" id="af-name" required></div>
+        <div class="field full"><label>Title</label><input type="text" id="af-title" placeholder="Licensed Real Estate Salesperson" required></div>
+        <div class="field full"><label>Biography</label><textarea id="af-bio" rows="3"></textarea></div>
+        <div class="field"><label>Phone</label><input type="tel" id="af-phone"></div>
+        <div class="field"><label>Email</label><input type="email" id="af-email"></div>
+        <div class="field"><label>License Number</label><input type="text" id="af-license"></div>
+        <div class="field"><label>Certifications</label><input type="text" id="af-certs" placeholder="AHWD, CBR, GRI"></div>
+        <div class="field full"><label>Areas Served</label><input type="text" id="af-areas"></div>
+        <div class="field"><label>Languages (comma-separated)</label><input type="text" id="af-languages"></div>
+        <div class="field"><label>Specialties (comma-separated)</label><input type="text" id="af-specialties"></div>
+        <div class="field full"><label>Photo URL</label><input type="text" id="af-photo"></div>
+        <div class="field"><div class="checkbox-row"><input type="checkbox" id="af-featured"><label for="af-featured">Featured on homepage</label></div></div>
+        <div class="field"><label>Status</label><select id="af-status"><option>Active</option><option>Inactive</option></select></div>
+      </div>
+      <button type="submit" class="btn btn--navy mt-40">Save Agent</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  function showAuthError(msg) {
+    const el = document.getElementById("auth-error");
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+
+  document.getElementById("signin-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("si-email").value;
+    const password = document.getElementById("si-pass").value;
+    const { error } = await adminSignIn(email, password);
+    if (error) return showAuthError(error.message);
+    await route();
+  });
+
+  document.getElementById("pending-signout").addEventListener("click", async () => { await adminSignOut(); route(); });
+  document.getElementById("signout-link").addEventListener("click", async () => { await adminSignOut(); route(); });
+
+  /* ---------- Routing: auth -> pending -> dashboard ---------- */
+  let MY_ROLE = null;
+  async function route() {
+    const session = await adminGetSession();
+    if (!session) {
+      document.getElementById("auth-shell").style.display = "block";
+      document.getElementById("pending-shell").style.display = "none";
+      document.getElementById("admin-shell").style.display = "none";
+      return;
+    }
+    const role = await adminGetMyRole();
+    if (!role) {
+      document.getElementById("auth-shell").style.display = "none";
+      document.getElementById("pending-shell").style.display = "block";
+      document.getElementById("admin-shell").style.display = "none";
+      document.getElementById("pending-email").textContent = session.user.email;
+      return;
+    }
+    MY_ROLE = role;
+    document.getElementById("auth-shell").style.display = "none";
+    document.getElementById("pending-shell").style.display = "none";
+    document.getElementById("admin-shell").style.display = "flex";
+    document.getElementById("who-am-i").textContent = `${session.user.email} — ${role.role.replace("_", " ")}`;
+    initDashboard();
+  }
+
+  /* ---------- Sidebar panel switching ---------- */
+  document.querySelectorAll(".admin-sidebar [data-panel]").forEach((link) => {
+    link.addEventListener("click", () => {
+      document.querySelectorAll(".admin-sidebar [data-panel]").forEach((l) => l.classList.remove("is-active"));
+      link.classList.add("is-active");
+      document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("is-active"));
+      document.getElementById(`panel-${link.dataset.panel}`).classList.add("is-active");
+    });
+  });
+
+  /* ---------- Modal helpers ---------- */
+  function openModal(id) { document.getElementById(id).classList.add("is-open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("is-open"); }
+  document.querySelectorAll("[data-close]").forEach((btn) => btn.addEventListener("click", () => closeModal(btn.dataset.close)));
+
+  let dashboardLoaded = false;
+
+  async function initDashboard() {
+    await Promise.all([refreshOverview(), refreshProperties(), refreshAgents(), refreshInquiries(), refreshReviews(), refreshTeam()]);
+    if (!dashboardLoaded) {
+      dashboardLoaded = true;
+      document.getElementById("add-property-btn").addEventListener("click", () => openPropertyModal());
+      document.getElementById("add-agent-btn").addEventListener("click", () => openAgentModal());
+      document.getElementById("property-form").addEventListener("submit", savePropertyForm);
+      document.getElementById("agent-form").addEventListener("submit", saveAgentForm);
+      document.getElementById("add-team-btn").addEventListener("click", () => openTeamModal());
+      document.getElementById("team-form").addEventListener("submit", saveTeamForm);
+      document.getElementById("tf-role").addEventListener("change", (e) => {
+        document.getElementById("tf-agent-row").style.display = e.target.value === "agent" ? "block" : "none";
+      });
+    }
+  }
+
+  async function refreshOverview() {
+    const [properties, agents, inquiries] = await Promise.all([adminListProperties(), adminListAgents(), adminListInquiries()]);
+    document.getElementById("stat-properties").textContent = properties.length;
+    document.getElementById("stat-agents").textContent = agents.length;
+    document.getElementById("stat-inquiries").textContent = inquiries.filter((i) => i.status === "New").length;
+  }
+
+  /* ---------- Properties panel ---------- */
+  let AGENTS_CACHE = [];
+
+  async function refreshProperties() {
+    const properties = await adminListProperties();
+    document.getElementById("properties-table").innerHTML = properties.length ? properties.map((p) => `
+      <tr>
+        <td><img class="thumb" src="${p.featured_image || ''}" alt=""></td>
+        <td>${p.title}</td>
+        <td>${p.address || "—"}</td>
+        <td>${formatPrice(p.price)}</td>
+        <td>${p.status}</td>
+        <td>${p.agents ? p.agents.full_name : "Unassigned"}</td>
+        <td>${p.is_featured ? '<span class="pill pill--featured">Featured</span>' : "—"}</td>
+        <td>${p.is_published ? '<span class="pill pill--active">Published</span>' : '<span class="pill pill--inactive">Unpublished</span>'}</td>
+        <td class="row-actions">
+          <button onclick="openPropertyModal('${p.id}')">Edit</button>
+          <button onclick="togglePropertyPublish('${p.id}', ${p.is_published})">${p.is_published ? "Unpublish" : "Publish"}</button>
+          <button class="danger" onclick="removeProperty('${p.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join("") : `<tr class="empty-row"><td colspan="9">No properties yet.</td></tr>`;
+  }
+
+  async function openPropertyModal(id) {
+    AGENTS_CACHE = await adminListAgents();
+    const select = document.getElementById("pf-agent");
+    select.innerHTML = `<option value="">Unassigned</option>` + AGENTS_CACHE.map((a) => `<option value="${a.id}">${a.full_name}</option>`).join("");
+
+    document.getElementById("property-form").reset();
+    document.getElementById("pf-id").value = "";
+    document.getElementById("pf-published").checked = true;
+
+    if (id) {
+      const properties = await adminListProperties();
+      const p = properties.find((x) => x.id === id);
+      if (!p) return;
+      document.getElementById("property-modal-title").textContent = "Edit Property";
+      document.getElementById("pf-id").value = p.id;
+      document.getElementById("pf-title").value = p.title || "";
+      document.getElementById("pf-description").value = p.description || "";
+      document.getElementById("pf-price").value = p.price || "";
+      document.getElementById("pf-type").value = p.property_type || "Single Family";
+      document.getElementById("pf-address").value = p.address || "";
+      document.getElementById("pf-zip").value = p.zip_code || "";
+      document.getElementById("pf-status").value = p.status || "For Sale";
+      document.getElementById("pf-beds").value = p.bedrooms || "";
+      document.getElementById("pf-baths").value = p.bathrooms || "";
+      document.getElementById("pf-sqft").value = p.square_feet || "";
+      document.getElementById("pf-year").value = p.year_built || "";
+      document.getElementById("pf-features").value = (p.features || []).join(", ");
+      document.getElementById("pf-image").value = p.featured_image || "";
+      document.getElementById("pf-gallery").value = (p.images || []).join(", ");
+      document.getElementById("pf-agent").value = p.agent_id || "";
+      document.getElementById("pf-featured").checked = !!p.is_featured;
+      document.getElementById("pf-published").checked = !!p.is_published;
+    } else {
+      document.getElementById("property-modal-title").textContent = "Add Property";
+    }
+    openModal("property-modal");
+  }
+
+  async function savePropertyForm(e) {
+    e.preventDefault();
+    const id = document.getElementById("pf-id").value;
+    const fields = {
+      title: document.getElementById("pf-title").value,
+      description: document.getElementById("pf-description").value,
+      price: Number(document.getElementById("pf-price").value) || null,
+      property_type: document.getElementById("pf-type").value,
+      address: document.getElementById("pf-address").value,
+      zip_code: document.getElementById("pf-zip").value,
+      status: document.getElementById("pf-status").value,
+      bedrooms: Number(document.getElementById("pf-beds").value) || null,
+      bathrooms: Number(document.getElementById("pf-baths").value) || null,
+      square_feet: Number(document.getElementById("pf-sqft").value) || null,
+      year_built: Number(document.getElementById("pf-year").value) || null,
+      features: document.getElementById("pf-features").value.split(",").map((s) => s.trim()).filter(Boolean),
+      featured_image: document.getElementById("pf-image").value,
+      images: document.getElementById("pf-gallery").value.split(",").map((s) => s.trim()).filter(Boolean),
+      agent_id: document.getElementById("pf-agent").value || null,
+      is_featured: document.getElementById("pf-featured").checked,
+      is_published: document.getElementById("pf-published").checked,
+    };
+    const { error } = id ? await adminUpdateProperty(id, fields) : await adminCreateProperty(fields);
+    if (error) { alert("Error saving property: " + error.message); return; }
+    closeModal("property-modal");
+    refreshProperties();
+    refreshOverview();
+  }
+
+  async function togglePropertyPublish(id, current) {
+    await adminSetPropertyPublished(id, !current);
+    refreshProperties();
+  }
+
+  async function removeProperty(id) {
+    if (!confirm("Permanently delete this property? This cannot be undone.")) return;
+    await adminDeleteProperty(id);
+    refreshProperties();
+    refreshOverview();
+  }
+
+  /* ---------- Agents panel ---------- */
+  async function refreshAgents() {
+    const agents = await adminListAgents();
+    document.getElementById("agents-table").innerHTML = agents.length ? agents.map((a) => `
+      <tr>
+        <td><img class="thumb-round" src="${a.photo_url || ''}" alt=""></td>
+        <td>${a.full_name}</td>
+        <td>${a.title || "—"}</td>
+        <td>${a.areas_served || "—"}</td>
+        <td>${a.status === "Active" ? '<span class="pill pill--active">Active</span>' : '<span class="pill pill--inactive">Inactive</span>'}</td>
+        <td>${a.is_featured ? '<span class="pill pill--featured">Featured</span>' : "—"}</td>
+        <td class="row-actions">
+          <button onclick="openAgentModal('${a.id}')">Edit</button>
+          <button onclick="toggleAgentStatus('${a.id}', '${a.status}')">${a.status === "Active" ? "Deactivate" : "Activate"}</button>
+        </td>
+      </tr>
+    `).join("") : `<tr class="empty-row"><td colspan="7">No agents yet.</td></tr>`;
+  }
+
+  async function openAgentModal(id) {
+    document.getElementById("agent-form").reset();
+    document.getElementById("af-id").value = "";
+    document.getElementById("af-status").value = "Active";
+
+    if (id) {
+      const agents = await adminListAgents();
+      const a = agents.find((x) => x.id === id);
+      if (!a) return;
+      document.getElementById("agent-modal-title").textContent = "Edit Agent";
+      document.getElementById("af-id").value = a.id;
+      document.getElementById("af-name").value = a.full_name || "";
+      document.getElementById("af-title").value = a.title || "";
+      document.getElementById("af-bio").value = a.bio || "";
+      document.getElementById("af-phone").value = a.phone || "";
+      document.getElementById("af-email").value = a.email || "";
+      document.getElementById("af-license").value = a.license_number || "";
+      document.getElementById("af-certs").value = a.certifications || "";
+      document.getElementById("af-areas").value = a.areas_served || "";
+      document.getElementById("af-languages").value = (a.languages || []).join(", ");
+      document.getElementById("af-specialties").value = (a.specialties || []).join(", ");
+      document.getElementById("af-photo").value = a.photo_url || "";
+      document.getElementById("af-featured").checked = !!a.is_featured;
+      document.getElementById("af-status").value = a.status || "Active";
+    } else {
+      document.getElementById("agent-modal-title").textContent = "Add Agent";
+    }
+    openModal("agent-modal");
+  }
+
+  async function saveAgentForm(e) {
+    e.preventDefault();
+    const id = document.getElementById("af-id").value;
+    const fields = {
+      full_name: document.getElementById("af-name").value,
+      title: document.getElementById("af-title").value,
+      bio: document.getElementById("af-bio").value,
+      phone: document.getElementById("af-phone").value,
+      email: document.getElementById("af-email").value,
+      license_number: document.getElementById("af-license").value,
+      certifications: document.getElementById("af-certs").value,
+      areas_served: document.getElementById("af-areas").value,
+      languages: document.getElementById("af-languages").value.split(",").map((s) => s.trim()).filter(Boolean),
+      specialties: document.getElementById("af-specialties").value.split(",").map((s) => s.trim()).filter(Boolean),
+      photo_url: document.getElementById("af-photo").value,
+      is_featured: document.getElementById("af-featured").checked,
+      status: document.getElementById("af-status").value,
+    };
+    const { error } = id ? await adminUpdateAgent(id, fields) : await adminCreateAgent(fields);
+    if (error) { alert("Error saving agent: " + error.message); return; }
+    closeModal("agent-modal");
+    refreshAgents();
+    refreshOverview();
+  }
+
+  async function toggleAgentStatus(id, current) {
+    await adminSetAgentStatus(id, current === "Active" ? "Inactive" : "Active");
+    refreshAgents();
+  }
+
+  /* ---------- Inquiries panel ---------- */
+  async function refreshInquiries() {
+    const inquiries = await adminListInquiries();
+    document.getElementById("inquiries-table").innerHTML = inquiries.length ? inquiries.map((i) => `
+      <tr>
+        <td>${new Date(i.created_at).toLocaleString()}</td>
+        <td>${i.name || "—"}</td>
+        <td>${i.email || "—"}<br>${i.phone || ""}</td>
+        <td>${i.inquiry_type || "—"}</td>
+        <td>${i.properties ? i.properties.title : "—"}</td>
+        <td style="max-width:220px;">${i.message || "—"}</td>
+        <td>${i.agents ? i.agents.full_name : "—"}</td>
+        <td>
+          <select onchange="updateInquiryStatus('${i.id}', this.value)">
+            ${["New","Contacted","In Progress","Closed"].map((s) => `<option ${s === i.status ? "selected" : ""}>${s}</option>`).join("")}
+          </select>
+        </td>
+      </tr>
+    `).join("") : `<tr class="empty-row"><td colspan="8">No inquiries yet.</td></tr>`;
+  }
+
+  async function updateInquiryStatus(id, status) {
+    await adminUpdateInquiryStatus(id, status);
+    refreshOverview();
+  }
+
+  /* ---------- Reviews panel ---------- */
+  async function refreshReviews() {
+    const reviews = await adminListReviews();
+    document.getElementById("reviews-table").innerHTML = reviews.length ? reviews.map((r) => `
+      <tr>
+        <td>${r.reviewer_name}</td>
+        <td>${r.review_date || "—"}</td>
+        <td>${r.rating || "—"} / 5</td>
+        <td style="max-width:280px;">${r.quote}</td>
+        <td>${r.is_published ? '<span class="pill pill--active">Published</span>' : '<span class="pill pill--inactive">Hidden</span>'}</td>
+        <td class="row-actions"><button onclick="toggleReviewPublish('${r.id}', ${r.is_published})">${r.is_published ? "Hide" : "Publish"}</button></td>
+      </tr>
+    `).join("") : `<tr class="empty-row"><td colspan="6">No reviews yet.</td></tr>`;
+  }
+
+  async function toggleReviewPublish(id, current) {
+    await adminSetReviewPublished(id, !current);
+    refreshReviews();
+  }
+
+  /* ---------- Team panel ---------- */
+  async function refreshTeam() {
+    const team = await adminListTeam();
+    const canInvite = MY_ROLE && MY_ROLE.role === "super_admin";
+    document.getElementById("add-team-btn").style.display = canInvite ? "inline-block" : "none";
+    document.getElementById("team-note").textContent = canInvite
+      ? "Super admins can invite new admin or agent accounts and assign their role."
+      : "Only super admins can view and manage the full team list.";
+
+    document.getElementById("team-table").innerHTML = team.length ? team.map((t) => `
+      <tr>
+        <td>${t.full_name || "—"}</td>
+        <td>${t.email || "—"}</td>
+        <td>${(t.role || "").replace("_", " ")}</td>
+        <td>${t.agents ? t.agents.full_name : "—"}</td>
+      </tr>
+    `).join("") : `<tr class="empty-row"><td colspan="4">${canInvite ? "No team members yet." : "You don't have permission to view the full team list."}</td></tr>`;
+  }
+
+  async function openTeamModal() {
+    document.getElementById("team-form").reset();
+    document.getElementById("team-error").style.display = "none";
+    document.getElementById("tf-agent-row").style.display = "none";
+    const agents = await adminListAgents();
+    document.getElementById("tf-agent").innerHTML = agents.map((a) => `<option value="${a.id}">${a.full_name}</option>`).join("");
+    openModal("team-modal");
+  }
+
+  async function saveTeamForm(e) {
+    e.preventDefault();
+    const errEl = document.getElementById("team-error");
+    errEl.style.display = "none";
+
+    const fullName = document.getElementById("tf-name").value;
+    const email = document.getElementById("tf-email").value;
+    const password = document.getElementById("tf-password").value;
+    const role = document.getElementById("tf-role").value;
+    const agentId = document.getElementById("tf-agent").value;
+
+    const { data: sessionData } = await sb.auth.getSession();
+    const token = sessionData.session.access_token;
+
+    try {
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/admin-invite-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ email, password, fullName, role, agentId: role === "agent" ? agentId : null }),
+      });
+      const result = await resp.json();
+      if (!resp.ok || result.error) {
+        errEl.textContent = result.error || "Failed to create account.";
+        errEl.style.display = "block";
+        return;
+      }
+      closeModal("team-modal");
+      refreshTeam();
+    } catch (err) {
+      errEl.textContent = String(err);
+      errEl.style.display = "block";
+    }
+  }
+
+  route();
+</script>
+</body>
+</html>

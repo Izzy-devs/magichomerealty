@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Profile | Magic Home Realty</title>
+<meta name="description" content="View agent profile, contact information, and current listings with Magic Home Realty.">
+<link rel="canonical" href="https://www.magichomerealty.com/agent.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .agent-profile { display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 780px) { .agent-profile { grid-template-columns: 1fr; } }
+  .agent-profile__photo { border-radius: var(--radius); overflow: hidden; aspect-ratio: 3/4; background: var(--bg-light); }
+  .agent-profile__photo img { width: 100%; height: 100%; object-fit: cover; }
+  .meta-list { list-style: none; padding: 0; margin: 18px 0; display: flex; flex-direction: column; gap: 10px; font-size: 0.92rem; }
+  .meta-list strong { color: var(--navy); display: inline-block; min-width: 110px; }
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .tag { background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 0.8rem; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">MAGIC <span>HOME</span> REALTY</a>
+    <nav class="main-nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html" data-nav="index.html">Home</a></li>
+        <li><a href="properties.html" data-nav="properties.html">Properties</a></li>
+        <li><a href="services.html" data-nav="services.html">Services</a></li>
+        <li><a href="agents.html" data-nav="agents.html">Agents</a></li>
+        <li><a href="about.html" data-nav="about.html">About</a></li>
+        <li><a href="contact.html" data-nav="contact.html">Contact</a></li>
+        <li><a href="admin.html" data-nav="admin.html" class="nav-admin-link">Admin</a></li>
+      </ul>
+      <a href="contact.html" class="btn btn--gold btn--sm">Talk to an Agent</a>
+    </nav>
+    <div class="header-actions">
+      <a class="header-phone" href="tel:+17182971800">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.5 2.3.8 3.6.8.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.5 21 3 13.5 3 4c0-.6.4-1 1-1h3.2c.6 0 1 .4 1 1 0 1.3.3 2.5.8 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg>
+        (718) 297-1800
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section" style="padding-top:150px;">
+    <div class="container">
+      <div class="breadcrumb" style="color:var(--text-secondary);margin-bottom:24px;"><a href="index.html">Home</a> / <a href="agents.html">Agents</a> / <span id="crumb-name">Agent</span></div>
+
+      <div class="agent-profile">
+        <div class="agent-profile__photo"><img id="a-photo" src="" alt=""></div>
+        <div>
+          <span class="property-card__type" id="a-role">Agent</span>
+          <h1 id="a-name">Loading…</h1>
+          <p id="a-creds" style="color:var(--text-secondary);"></p>
+
+          <ul class="meta-list">
+            <li><strong>Areas Served</strong><span id="a-areas"></span></li>
+            <li id="a-languages-row" style="display:none;"><strong>Languages</strong><span id="a-languages"></span></li>
+            <li id="a-specialties-row" style="display:none;"><strong>Specialties</strong><span id="a-specialties"></span></li>
+          </ul>
+
+          <h3>About</h3>
+          <p id="a-bio"></p>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+            <a href="contact.html" class="btn btn--gold">Contact Agent</a>
+            <a href="contact.html" class="btn btn--outline-dark">Schedule a Showing</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head mt-40" style="margin-top:60px;">
+        <span class="kicker">Current Listings</span>
+        <h2 id="a-listings-heading">Listings</h2>
+        <hr class="rule">
+      </div>
+      <div class="property-grid" id="agent-listings"></div>
+      <p id="a-no-listings" style="display:none;color:var(--text-secondary);">No active listings assigned to this agent right now.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-logo">MAGIC <span>HOME</span> REALTY</div><p style="max-width:34ch">Helping you find your place in New York.</p></div>
+      <div><h4>Navigate</h4><ul>
+        <li><a href="index.html">Home</a></li><li><a href="properties.html">Properties</a></li>
+        <li><a href="services.html">Services</a></li><li><a href="agents.html">Agents</a></li>
+        <li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
+      </ul></div>
+      <div><h4>Contact</h4><ul><li>8806 162nd St</li><li>Jamaica, NY 11432</li><li><a href="tel:+17182971800">(718) 297-1800</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Magic Home Realty. All rights reserved.</span><div class="footer-social"><a href="#">Facebook</a><a href="#">Instagram</a><a href="#">LinkedIn</a></div></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script src="js/script.js"></script>
+<script>
+  (async function () {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const a = await loadAgentById(id);
+    if (!a) return;
+
+    document.title = `${a.name} | Magic Home Realty`;
+    document.getElementById("crumb-name").textContent = a.name;
+    document.getElementById("a-photo").src = a.photo;
+    document.getElementById("a-photo").alt = `Portrait of ${a.name}`;
+    document.getElementById("a-role").textContent = a.role;
+    document.getElementById("a-name").textContent = a.name;
+    document.getElementById("a-creds").textContent = a.credentials || "";
+    document.getElementById("a-areas").textContent = a.areas || "—";
+    document.getElementById("a-bio").textContent = a.bio || "";
+
+    if (a.languages && a.languages.length) {
+      document.getElementById("a-languages-row").style.display = "flex";
+      document.getElementById("a-languages").textContent = a.languages.join(", ");
+    }
+    if (a.specialties && a.specialties.length) {
+      document.getElementById("a-specialties-row").style.display = "flex";
+      document.getElementById("a-specialties").textContent = a.specialties.join(", ");
+    }
+
+    const listings = await loadPropertiesByAgent(a.id);
+    document.getElementById("a-listings-heading").textContent = `Listings by ${a.name.split(" ")[0]}`;
+    if (!listings.length) {
+      document.getElementById("a-no-listings").style.display = "block";
+    } else {
+      document.getElementById("agent-listings").innerHTML = listings.map((p) => `
+        <div class="property-card reveal">
+          <div class="property-card__media">
+            <img src="${p.image}" alt="${p.title} in ${p.address}" loading="lazy">
+            <span class="badge badge--gold">${p.status}</span>
+            <span class="property-card__price">${formatPrice(p.price)}</span>
+          </div>
+          <div class="property-card__body">
+            <span class="property-card__type">${p.type}</span>
+            <h3>${p.title}</h3>
+            <p class="property-card__address">${p.address}</p>
+            <div class="property-card__stats">
+              <span><strong>${p.beds}</strong> Beds</span>
+              <span><strong>${p.baths}</strong> Baths</span>
+              <span><strong>${(p.sqft || 0).toLocaleString()}</strong> Sq Ft</span>
+            </div>
+            <a href="property.html?id=${p.id}" class="btn btn--outline-dark btn--block btn--sm">View Property</a>
+          </div>
+        </div>
+      `).join("");
+    }
+    initRevealOnScroll();
+  })();
+</script>
+</body>
+</html>

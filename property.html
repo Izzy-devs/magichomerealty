@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Details | Magic Home Realty</title>
+<meta name="description" content="View property details, photos, and pricing for homes for sale with Magic Home Realty in Queens, NY.">
+<link rel="canonical" href="https://www.magichomerealty.com/property.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 40px; }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
+  .gallery-main { aspect-ratio: 4/3; overflow: hidden; border-radius: var(--radius); }
+  .gallery-side { display: grid; grid-template-rows: 1fr 1fr; gap: 10px; }
+  .gallery-side div { overflow: hidden; border-radius: var(--radius); }
+  @media (max-width: 780px) { .gallery { grid-template-columns: 1fr; } .gallery-side { grid-template-columns: 1fr 1fr; grid-template-rows: none; } }
+
+  .detail-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; } }
+
+  .spec-strip { display: flex; gap: 28px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 20px 0; margin: 20px 0; flex-wrap: wrap; }
+  .spec-strip div { font-size: 0.9rem; color: var(--text-secondary); }
+  .spec-strip strong { display: block; color: var(--navy); font-family: var(--font-head); font-size: 1.3rem; }
+
+  .feature-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .feature-list li { font-size: 0.92rem; color: var(--text); padding-left: 18px; position: relative; }
+  .feature-list li::before { content: '—'; position: absolute; left: 0; color: var(--gold); }
+
+  .sidebar-card { background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; }
+  .sidebar-card + .sidebar-card { margin-top: 22px; }
+  .contact-quick { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">MAGIC <span>HOME</span> REALTY</a>
+    <nav class="main-nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html" data-nav="index.html">Home</a></li>
+        <li><a href="properties.html" data-nav="properties.html">Properties</a></li>
+        <li><a href="services.html" data-nav="services.html">Services</a></li>
+        <li><a href="agents.html" data-nav="agents.html">Agents</a></li>
+        <li><a href="about.html" data-nav="about.html">About</a></li>
+        <li><a href="contact.html" data-nav="contact.html">Contact</a></li>
+        <li><a href="admin.html" data-nav="admin.html" class="nav-admin-link">Admin</a></li>
+      </ul>
+      <a href="contact.html" class="btn btn--gold btn--sm">Talk to an Agent</a>
+    </nav>
+    <div class="header-actions">
+      <a class="header-phone" href="tel:+17182971800">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.5 2.3.8 3.6.8.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.5 21 3 13.5 3 4c0-.6.4-1 1-1h3.2c.6 0 1 .4 1 1 0 1.3.3 2.5.8 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg>
+        (718) 297-1800
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section" style="padding-top:150px;">
+    <div class="container">
+      <div class="breadcrumb" style="color:var(--text-secondary);margin-bottom:20px;"><a href="index.html">Home</a> / <a href="properties.html">Properties</a> / <span id="crumb-title">Property</span></div>
+
+      <div class="gallery" id="gallery"></div>
+
+      <div class="detail-layout">
+        <div>
+          <span class="property-card__type" id="p-type">Property</span>
+          <h1 id="p-title">Loading…</h1>
+          <p class="property-card__address" id="p-address" style="font-size:1.05rem;"></p>
+
+          <div class="spec-strip">
+            <div><strong id="p-price">—</strong>Price</div>
+            <div><strong id="p-beds">—</strong>Beds</div>
+            <div><strong id="p-baths">—</strong>Baths</div>
+            <div><strong id="p-sqft">—</strong>Sq Ft</div>
+          </div>
+
+          <h3>About This Property</h3>
+          <p id="p-description"></p>
+
+          <h3>Features</h3>
+          <ul class="feature-list" id="p-features"></ul>
+        </div>
+
+        <div>
+          <div class="sidebar-card">
+            <h3>Schedule a Showing</h3>
+            <p style="font-size:0.9rem;color:var(--text-secondary)">Request more information or book a showing with a Magic Home Realty agent.</p>
+            <form data-inquiry-form>
+              <input type="hidden" name="inquiryType" value="Property Showing">
+              <input type="hidden" name="propertyId" id="p-id-field">
+              <div class="field" style="margin-bottom:12px;"><label for="d-name">Name</label><input type="text" id="d-name" name="name" required></div>
+              <div class="field" style="margin-bottom:12px;"><label for="d-email">Email</label><input type="email" id="d-email" name="email" required></div>
+              <div class="field" style="margin-bottom:12px;"><label for="d-phone">Phone</label><input type="tel" id="d-phone" name="phone"></div>
+              <div class="field" style="margin-bottom:14px;"><label for="d-message">Message</label><textarea id="d-message" name="message" rows="3" placeholder="I'd like to schedule a showing…"></textarea></div>
+              <button type="submit" class="btn btn--navy btn--block" data-label="Request More Information">Request More Information</button>
+            </form>
+            <div class="form-success">Thank you — your request has been received. A Magic Home Realty agent will follow up shortly.</div>
+          </div>
+
+          <div class="sidebar-card" id="agent-card" style="display:none;">
+            <h3>Listed By</h3>
+            <p id="agent-name" style="font-weight:600;color:var(--navy);margin-bottom:4px;"></p>
+            <a href="#" id="agent-link" class="btn btn--outline-dark btn--sm">View Agent Profile</a>
+          </div>
+
+          <div class="sidebar-card">
+            <h3>Contact Us Directly</h3>
+            <div class="contact-quick">
+              <a href="tel:+17182971800" class="btn btn--outline-dark btn--block btn--sm">Call Now — (718) 297-1800</a>
+              <a href="https://wa.me/17182971800" target="_blank" rel="noopener" class="btn btn--outline-dark btn--block btn--sm">Message on WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-logo">MAGIC <span>HOME</span> REALTY</div><p style="max-width:34ch">Helping you find your place in New York.</p></div>
+      <div><h4>Navigate</h4><ul>
+        <li><a href="index.html">Home</a></li><li><a href="properties.html">Properties</a></li>
+        <li><a href="services.html">Services</a></li><li><a href="agents.html">Agents</a></li>
+        <li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
+      </ul></div>
+      <div><h4>Contact</h4><ul><li>8806 162nd St</li><li>Jamaica, NY 11432</li><li><a href="tel:+17182971800">(718) 297-1800</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Magic Home Realty. All rights reserved.</span><div class="footer-social"><a href="#">Facebook</a><a href="#">Instagram</a><a href="#">LinkedIn</a></div></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script src="js/script.js"></script>
+<script>
+  (async function () {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const p = await loadPropertyById(id);
+    if (!p) return;
+
+    document.title = `${p.title} | Magic Home Realty`;
+    document.getElementById("crumb-title").textContent = p.title;
+    document.getElementById("p-type").textContent = p.type;
+    document.getElementById("p-title").textContent = p.title;
+    document.getElementById("p-address").textContent = p.address;
+    document.getElementById("p-price").textContent = formatPrice(p.price);
+    document.getElementById("p-beds").textContent = p.beds;
+    document.getElementById("p-baths").textContent = p.baths;
+    document.getElementById("p-sqft").textContent = (p.sqft || 0).toLocaleString();
+    document.getElementById("p-description").textContent = p.description || "";
+    document.getElementById("p-id-field").value = p.id;
+    document.getElementById("p-features").innerHTML = (p.features || []).map((f) => `<li>${f}</li>`).join("");
+
+    if (p.agentName && p.agentId) {
+      document.getElementById("agent-card").style.display = "block";
+      document.getElementById("agent-name").textContent = p.agentName;
+      document.getElementById("agent-link").href = `agent.html?id=${p.agentId}`;
+    }
+
+    const gallery = p.gallery && p.gallery.length ? p.gallery : [p.image];
+    const [main, ...rest] = gallery;
+    document.getElementById("gallery").innerHTML = `
+      <div class="gallery-main"><img src="${main}" alt="${p.title} — main photo"></div>
+      <div class="gallery-side">
+        ${(rest.slice(0, 2).length ? rest.slice(0, 2) : [p.image, p.image]).map((src, i) =>
+          `<div><img src="${src}" alt="${p.title} — photo ${i + 2}"></div>`
+        ).join("")}
+      </div>
+    `;
+
+    initContactForms();
+  })();
+</script>
+</body>
+</html>
