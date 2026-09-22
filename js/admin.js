@@ -125,3 +125,32 @@ async function adminListReviews() {
 async function adminSetReviewPublished(id, isPublished) {
   return sb.from("reviews").update({ is_published: isPublished }).eq("id", id);
 }
+
+async function adminCreateReview(fields) {
+  return sb.from("reviews").insert([fields]).select().single();
+}
+
+async function adminUpdateReview(id, fields) {
+  return sb.from("reviews").update(fields).eq("id", id).select().single();
+}
+
+async function adminDeleteReview(id) {
+  return sb.from("reviews").delete().eq("id", id);
+}
+
+/* ---------- Image upload (Supabase Storage, bucket "media") ---------- */
+
+async function adminUploadImage(file, folder = "uploads") {
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+  const { error } = await sb.storage.from("media").upload(path, file, {
+    upsert: true,
+    contentType: file.type || "image/jpeg",
+  });
+  if (error) {
+    alert("Image upload failed: " + error.message);
+    throw error;
+  }
+  const { data } = sb.storage.from("media").getPublicUrl(path);
+  return data.publicUrl;
+}

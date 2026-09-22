@@ -197,3 +197,18 @@ function formatPrice(n) {
   if (n === null || n === undefined) return "Price on request";
   return "$" + Number(n).toLocaleString("en-US");
 }
+
+/**
+ * Fallback avatar built from a person's initials (e.g. "Israel Shobowale" -> "IS"),
+ * used whenever an agent has no photo. Rendered client-side, never stored.
+ */
+function initialsAvatar(name, bg = "0F172A", fg = "C9A227", size = 320) {
+  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+  const initials = (((parts[0] || "")[0] || "") + ((parts[parts.length - 1] || "")[0] || "")).toUpperCase() || "?";
+  const fontSize = Math.round(size / 2.6);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
+    `<rect width="100%" height="100%" fill="#${bg}"/>` +
+    `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#${fg}" ` +
+    `font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" letter-spacing="2">${initials}</text></svg>`;
+  return "data:image/svg+xml;base64," + btoa(svg);
+}

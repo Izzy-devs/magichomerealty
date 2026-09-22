@@ -115,7 +115,7 @@
 
     document.title = `${a.name} | Magic Home Realty`;
     document.getElementById("crumb-name").textContent = a.name;
-    document.getElementById("a-photo").src = a.photo;
+    document.getElementById("a-photo").src = a.photo || initialsAvatar(a.name);
     document.getElementById("a-photo").alt = `Portrait of ${a.name}`;
     document.getElementById("a-role").textContent = a.role;
     document.getElementById("a-name").textContent = a.name;

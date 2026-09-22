@@ -86,7 +86,7 @@
     const agents = await loadAgents();
     document.getElementById("agent-grid").innerHTML = agents.map((a) => `
       <div class="agent-card reveal">
-        <div class="agent-card__photo"><img src="${a.photo}" alt="Portrait of ${a.name}" loading="lazy"></div>
+        <div class="agent-card__photo"><img src="${a.photo || initialsAvatar(a.name)}" alt="Portrait of ${a.name}" loading="lazy"></div>
         <div class="agent-card__body">
           <h3>${a.name}</h3>
           <div class="agent-card__role">${a.role}</div>
