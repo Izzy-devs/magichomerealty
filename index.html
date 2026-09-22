@@ -261,7 +261,7 @@
     grid.innerHTML = properties.map((p) => `
       <div class="property-card reveal">
         <div class="property-card__media">
-          <img src="${p.image}" alt="${p.title} in ${p.address}" loading="lazy">
+          <img src="${p.image || propertyPlaceholder(p.title)}" alt="${p.title} in ${p.address}" loading="lazy">
           <span class="badge badge--gold">${p.status}</span>
           <span class="property-card__price">${formatPrice(p.price)}</span>
         </div>

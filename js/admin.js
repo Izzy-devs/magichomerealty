@@ -60,6 +60,10 @@ async function adminSetAgentStatus(id, status) {
   return sb.from("agents").update({ status }).eq("id", id);
 }
 
+async function adminDeleteAgent(id) {
+  return sb.from("agents").delete().eq("id", id);
+}
+
 /* ---------------- Properties (admin) ---------------- */
 
 async function adminListProperties() {

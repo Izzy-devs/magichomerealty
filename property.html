@@ -168,12 +168,13 @@
       document.getElementById("agent-link").href = `agent.html?id=${p.agentId}`;
     }
 
-    const gallery = p.gallery && p.gallery.length ? p.gallery : [p.image];
-    const [main, ...rest] = gallery;
+    const gallery = (p.gallery && p.gallery.length ? p.gallery : [p.image]).filter(Boolean);
+    const finalGallery = gallery.length ? gallery : [propertyPlaceholder(p.title)];
+    const [main, ...rest] = finalGallery;
     document.getElementById("gallery").innerHTML = `
       <div class="gallery-main"><img src="${main}" alt="${p.title} — main photo"></div>
       <div class="gallery-side">
-        ${(rest.slice(0, 2).length ? rest.slice(0, 2) : [p.image, p.image]).map((src, i) =>
+        ${(rest.slice(0, 2).length ? rest.slice(0, 2) : [main, main]).map((src, i) =>
           `<div><img src="${src}" alt="${p.title} — photo ${i + 2}"></div>`
         ).join("")}
       </div>

@@ -212,3 +212,18 @@ function initialsAvatar(name, bg = "0F172A", fg = "C9A227", size = 320) {
     `font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" letter-spacing="2">${initials}</text></svg>`;
   return "data:image/svg+xml;base64," + btoa(svg);
 }
+
+/**
+ * Fallback image for a property with no photo yet — a branded placeholder
+ * showing its title, so a listing without photos never renders as a
+ * broken image.
+ */
+function propertyPlaceholder(title, w = 800, h = 600) {
+  const label = (title || "Property Photo Coming Soon").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const fontSize = Math.max(20, Math.round(w / 22));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect width="100%" height="100%" fill="#0F172A"/>` +
+    `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#C9A227" ` +
+    `font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" letter-spacing="1">${label}</text></svg>`;
+  return "data:image/svg+xml;base64," + btoa(svg);
+}
