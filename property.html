@@ -10,12 +10,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 40px; }
-  .gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
-  .gallery-main { aspect-ratio: 4/3; overflow: hidden; border-radius: var(--radius); }
-  .gallery-side { display: grid; grid-template-rows: 1fr 1fr; gap: 10px; }
-  .gallery-side div { overflow: hidden; border-radius: var(--radius); }
-  @media (max-width: 780px) { .gallery { grid-template-columns: 1fr; } .gallery-side { grid-template-columns: 1fr 1fr; grid-template-rows: none; } }
+  .carousel { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: var(--radius); background: var(--bg-light); margin-bottom: 40px; }
+  .carousel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .carousel-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(15,23,42,0.6); color: #fff; border: none;
+    width: 44px; height: 44px; border-radius: 50%;
+    font-size: 1.6rem; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .carousel-arrow:hover { background: rgba(15,23,42,0.85); }
+  .carousel-arrow:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .carousel-arrow--prev { left: 14px; }
+  .carousel-arrow--next { right: 14px; }
+  .carousel-counter {
+    position: absolute; bottom: 14px; right: 14px;
+    background: rgba(15,23,42,0.7); color: #fff;
+    font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;
+  }
+  @media (max-width: 560px) {
+    .carousel-arrow { width: 38px; height: 38px; font-size: 1.3rem; }
+  }
 
   .detail-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: start; }
   @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; } }
@@ -66,7 +82,7 @@
     <div class="container">
       <div class="breadcrumb" style="color:var(--text-secondary);margin-bottom:20px;"><a href="index.html">Home</a> / <a href="properties.html">Properties</a> / <span id="crumb-title">Property</span></div>
 
-      <div class="gallery" id="gallery"></div>
+      <div class="carousel" id="gallery"></div>
 
       <div class="detail-layout">
         <div>
@@ -170,18 +186,42 @@
 
     const gallery = (p.gallery && p.gallery.length ? p.gallery : [p.image]).filter(Boolean);
     const finalGallery = gallery.length ? gallery : [propertyPlaceholder(p.title)];
-    const [main, ...rest] = finalGallery;
-    document.getElementById("gallery").innerHTML = `
-      <div class="gallery-main"><img src="${main}" alt="${p.title} — main photo"></div>
-      <div class="gallery-side">
-        ${(rest.slice(0, 2).length ? rest.slice(0, 2) : [main, main]).map((src, i) =>
-          `<div><img src="${src}" alt="${p.title} — photo ${i + 2}"></div>`
-        ).join("")}
-      </div>
-    `;
+    renderCarousel(finalGallery, p.title);
 
     initContactForms();
   })();
+
+  function renderCarousel(images, title) {
+    let index = 0;
+    const el = document.getElementById("gallery");
+    el.innerHTML = `
+      <img id="carousel-img" src="${images[0]}" alt="${title} — photo 1 of ${images.length}">
+      ${images.length > 1 ? `
+        <button class="carousel-arrow carousel-arrow--prev" id="carousel-prev" aria-label="Previous photo">&#8249;</button>
+        <button class="carousel-arrow carousel-arrow--next" id="carousel-next" aria-label="Next photo">&#8250;</button>
+        <span class="carousel-counter" id="carousel-counter">1 / ${images.length}</span>
+      ` : ""}
+    `;
+    if (images.length <= 1) return;
+
+    const imgEl = document.getElementById("carousel-img");
+    const counterEl = document.getElementById("carousel-counter");
+
+    function show(newIndex) {
+      index = (newIndex + images.length) % images.length;
+      imgEl.src = images[index];
+      imgEl.alt = `${title} — photo ${index + 1} of ${images.length}`;
+      counterEl.textContent = `${index + 1} / ${images.length}`;
+    }
+
+    document.getElementById("carousel-prev").addEventListener("click", () => show(index - 1));
+    document.getElementById("carousel-next").addEventListener("click", () => show(index + 1));
+    el.setAttribute("tabindex", "0");
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") show(index - 1);
+      if (e.key === "ArrowRight") show(index + 1);
+    });
+  }
 </script>
 </body>
 </html>
