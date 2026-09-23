@@ -551,7 +551,7 @@
     const properties = await adminListProperties();
     document.getElementById("properties-table").innerHTML = properties.length ? properties.map((p) => `
       <tr>
-        <td><img class="thumb" src="${p.featured_image || propertyPlaceholder(p.title, 100, 75)}" alt=""></td>
+        <td><img class="thumb" src="${p.featured_image || propertyPlaceholder(p.title, 100, 75)}" alt="" onerror="this.onerror=null;this.src='${propertyPlaceholder(p.title, 100, 75)}'"></td>
         <td>${p.title}</td>
         <td>${p.address || "—"}</td>
         <td>${formatPrice(p.price)}</td>

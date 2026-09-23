@@ -195,7 +195,7 @@
     let index = 0;
     const el = document.getElementById("gallery");
     el.innerHTML = `
-      <img id="carousel-img" src="${images[0]}" alt="${title} — photo 1 of ${images.length}">
+      <img id="carousel-img" src="${images[0]}" alt="${title} — photo 1 of ${images.length}" onerror="this.onerror=null;this.src='${propertyPlaceholder(title)}'">
       ${images.length > 1 ? `
         <button class="carousel-arrow carousel-arrow--prev" id="carousel-prev" aria-label="Previous photo">&#8249;</button>
         <button class="carousel-arrow carousel-arrow--next" id="carousel-next" aria-label="Next photo">&#8250;</button>
@@ -206,6 +206,7 @@
 
     const imgEl = document.getElementById("carousel-img");
     const counterEl = document.getElementById("carousel-counter");
+    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = propertyPlaceholder(title); };
 
     function show(newIndex) {
       index = (newIndex + images.length) % images.length;
